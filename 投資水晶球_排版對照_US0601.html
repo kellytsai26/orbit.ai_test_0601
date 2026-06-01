@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【投資水晶球】市場指令優化改版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1814;
+    --ink-soft:#46413a;
+    --paper:#f4f0e8;
+    --paper-card:#fbf9f4;
+    --rule:#d8d0c2;
+    --rule-strong:#b8ad99;
+    --accent:#9a2a2a;        /* 朱紅，舊報紙色系 */
+    --accent-new:#1f5c4d;    /* 墨綠，代表新版 */
+    --accent-new-soft:#e6efe9;
+    --accent-soft:#f4e6e2;
+    --gold:#9c7a32;
+    --serif:"Noto Serif TC", "Newsreader", Georgia, serif;
+    --sans:"Noto Sans TC", system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(154,42,42,.03), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(31,92,77,.03), transparent 40%);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    padding:0 0 80px;
+  }
+
+  /* ---------- 報頭 ---------- */
+  .masthead{
+    border-bottom:3px double var(--ink);
+    padding:34px 32px 22px;
+    max-width:1240px;
+    margin:0 auto;
+    text-align:center;
+  }
+  .masthead .kicker{
+    font-family:var(--sans);
+    font-size:.72rem;
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:14px;
+  }
+  .masthead h1{
+    font-family:var(--serif);
+    font-weight:900;
+    font-size:clamp(1.8rem, 4.4vw, 3.1rem);
+    letter-spacing:.04em;
+    line-height:1.12;
+    color:var(--ink);
+  }
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px;}
+
+  /* ---------- 指示說明 ---------- */
+  .instructions{
+    margin:36px auto 0;
+    padding:18px 22px;
+    background:#fffdf6;
+    border:1px solid var(--rule);
+    border-left:4px solid var(--gold);
+    border-radius:2px;
+    font-family:var(--serif);
+    font-size:.98rem;
+    line-height:1.85;
+    color:var(--ink-soft);
+    position:relative;
+  }
+  .instructions::before{
+    content:none;
+  }
+  .instructions > *+*{margin-top:.7em;}
+  .instructions strong{color:var(--ink);font-weight:700;}
+  .instructions ul,.instructions ol{padding-left:1.4em;}
+
+  /* ---------- 優化重點 ---------- */
+  .highlights{
+    margin:40px auto 8px;
+    background:var(--paper-card);
+    border:1px solid var(--rule);
+    border-top:4px solid var(--accent);
+    border-radius:2px;
+    padding:30px 34px 32px;
+    box-shadow:0 1px 0 var(--rule), 0 18px 40px -32px rgba(26,24,20,.5);
+    position:relative;
+  }
+  .highlights::before{
+    content:"重點摘要";
+    position:absolute;
+    top:-13px;left:28px;
+    background:var(--accent);
+    color:#fff;
+    font-family:var(--sans);
+    font-size:.7rem;
+    letter-spacing:.3em;
+    font-weight:700;
+    padding:5px 14px;
+    border-radius:2px;
+  }
+  .highlights h2{
+    font-family:var(--serif);
+    font-size:1.45rem;
+    font-weight:700;
+    letter-spacing:.04em;
+    margin-bottom:18px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .highlights h2 .num{
+    font-family:var(--serif);
+    font-style:italic;
+    color:var(--accent);
+    font-size:1.2rem;
+  }
+  .highlights ol{list-style:none;display:grid;gap:14px;}
+  .highlights li{
+    display:flex;gap:16px;
+    padding:14px 16px;
+    background:#fff;
+    border:1px solid var(--rule);
+    border-left:3px solid var(--gold);
+    border-radius:2px;
+    font-size:1rem;
+    color:var(--ink-soft);
+  }
+  .highlights li .idx{
+    flex:0 0 auto;
+    font-family:var(--serif);
+    font-weight:900;
+    font-size:1.3rem;
+    color:var(--accent);
+    line-height:1.3;
+    min-width:28px;
+  }
+  .highlights li b{color:var(--ink);font-weight:700;}
+
+  /* ---------- AI 分析（整篇差異總結，由 AI 產生） ---------- */
+  .ai-analysis{
+    margin:30px auto 0;
+    background:linear-gradient(180deg,#f4faf7,#fbfdfc);
+    border:1px solid var(--rule);
+    border-top:4px solid var(--accent-new);
+    border-radius:2px;
+    padding:30px 34px 30px;
+    position:relative;
+    box-shadow:0 18px 40px -34px rgba(31,92,77,.5);
+  }
+  .ai-analysis::before{
+    content:"AI 分析";
+    position:absolute;top:-13px;left:28px;
+    background:var(--accent-new);color:#fff;
+    font-family:var(--sans);font-size:.7rem;letter-spacing:.3em;font-weight:700;
+    padding:5px 14px;border-radius:2px;
+  }
+  .ai-analysis h2{
+    font-family:var(--serif);font-size:1.4rem;font-weight:700;letter-spacing:.04em;
+    margin-bottom:14px;display:flex;align-items:center;gap:12px;color:var(--accent-new);
+  }
+  .ai-analysis h2 .num{font-family:var(--serif);font-style:italic;font-size:1.1rem;}
+  .ai-analysis .body{font-family:var(--serif);font-size:1.04rem;line-height:1.9;color:var(--ink);}
+  .ai-analysis .body > *+*{margin-top:.9em;}
+  .ai-analysis .body strong{font-weight:700;color:var(--accent-new);}
+  .ai-analysis .body ul,.ai-analysis .body ol{padding-left:1.4em;}
+  .ai-analysis .body li{margin-top:.35em;}
+
+  /* ---------- 並排比對 ---------- */
+  .compare-head{
+    display:flex;align-items:center;gap:18px;
+    margin:46px 0 18px;
+  }
+  .compare-head .line{flex:1;height:1px;background:var(--rule-strong);}
+  .compare-head .label{
+    font-family:var(--sans);
+    font-size:.74rem;
+    letter-spacing:.36em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:700;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0;
+    border:1px solid var(--rule-strong);
+    border-radius:3px;
+    overflow:hidden;
+    background:var(--paper-card);
+    box-shadow:0 24px 60px -44px rgba(26,24,20,.6);
+  }
+  .col{padding:0;position:relative;}
+  .col.current{border-right:1px dashed var(--rule-strong);}
+
+  .col-tab{
+    display:flex;align-items:baseline;gap:12px;
+    padding:16px 26px;
+    border-bottom:2px solid var(--rule-strong);
+    position:sticky;top:0;z-index:3;
+  }
+  .col-tab:first-of-type{border-right:1px dashed var(--rule-strong);background:linear-gradient(180deg,#f1ebe0,#faf7f1);}
+  .col-tab:nth-of-type(2){background:linear-gradient(180deg,var(--accent-new-soft),#f7fbf9);}
+
+  .col-tab .tag{
+    font-family:var(--sans);
+    font-size:.68rem;
+    font-weight:700;
+    letter-spacing:.2em;
+    padding:4px 10px;
+    border-radius:999px;
+    text-transform:uppercase;
+  }
+  .col-tab:first-of-type .tag{background:var(--ink);color:var(--paper);}
+  .col-tab:nth-of-type(2) .tag{background:var(--accent-new);color:#fff;}
+  .col-tab h3{
+    font-family:var(--serif);
+    font-size:1.3rem;
+    font-weight:700;
+    letter-spacing:.03em;
+  }
+  .col-tab:first-of-type h3{color:var(--ink-soft);}
+  .col-tab:nth-of-type(2) h3{color:var(--accent-new);}
+
+  /* 文章內容區 —— 適用 markdown 轉出的段落、標題、條列、表格 */
+  .article{
+    font-family:var(--serif);
+    font-size:1.04rem;
+    line-height:1.95;
+    color:var(--ink);
+  }
+  .article > *+*{margin-top:1.05em;}
+  .article h4{
+    font-family:var(--sans);
+    font-weight:900;
+    font-size:1.06rem;
+    letter-spacing:.02em;
+    padding-top:.4em;
+    color:var(--ink);
+  }
+  .seg.next .article h4{color:var(--accent-new);}
+  .article p{text-align:justify;}
+  .article ul,.article ol{padding-left:1.4em;}
+  .article li{margin-top:.4em;}
+  .article strong{font-weight:700;background:linear-gradient(transparent 62%, var(--accent-soft) 62%);}
+  .seg.next .article strong{background:linear-gradient(transparent 62%, var(--accent-new-soft) 62%);}
+  .article .lede{
+    font-size:1.12rem;font-weight:500;color:var(--ink-soft);
+    border-left:3px solid var(--rule-strong);padding-left:16px;
+  }
+  .article table{
+    width:100%;border-collapse:collapse;font-family:var(--sans);
+    font-size:.92rem;margin:.4em 0;
+  }
+  .article th,.article td{
+    border:1px solid var(--rule);padding:8px 10px;text-align:left;
+  }
+  .article th{background:#efe9dd;font-weight:700;}
+  .seg.next .article th{background:var(--accent-new-soft);}
+  .article .num{font-variant-numeric:tabular-nums;}
+  .pos{color:var(--accent-new);font-weight:700;}
+  .neg{color:var(--accent);font-weight:700;}
+
+  /* ---------- 分組對照（每組各自標注重點） ---------- */
+  .section-note{
+    grid-column:1 / -1;
+    display:flex;align-items:flex-start;gap:14px;
+    padding:16px 26px;
+    background:linear-gradient(90deg, #f6efe0, #faf7f0);
+    border-top:1px solid var(--rule-strong);
+    border-bottom:1px solid var(--rule);
+  }
+  .section-note .sec-title{
+    font-family:var(--serif);font-weight:700;font-size:1.18rem;
+    letter-spacing:.04em;color:var(--ink);flex:0 0 auto;
+    border-right:1px solid var(--rule-strong);padding-right:16px;min-width:88px;
+  }
+  .section-note .sec-why{
+    font-family:var(--sans);font-size:.9rem;line-height:1.6;color:var(--ink-soft);
+  }
+  .section-note .sec-why .badge{
+    display:inline-block;font-size:.64rem;font-weight:700;letter-spacing:.18em;
+    color:var(--gold);border:1px solid var(--gold);border-radius:999px;
+    padding:2px 9px;margin-right:9px;text-transform:uppercase;vertical-align:1px;
+  }
+  .section-note .sec-why b{color:var(--ink);}
+  /* 分組模式下每段的左右兩半 */
+  .seg{padding:24px 32px 30px;}
+  .seg.current{border-right:1px dashed var(--rule-strong);}
+  .seg.next{background:linear-gradient(180deg,#fbfdfc,transparent 160px);}
+
+  /* ---------- 行動 / 頁尾 ---------- */
+  .controls{
+    display:flex;justify-content:center;gap:14px;margin:30px 0 0;flex-wrap:wrap;
+  }
+  .controls button{
+    font-family:var(--sans);font-size:.85rem;font-weight:700;letter-spacing:.04em;
+    border:1px solid var(--rule-strong);background:var(--paper-card);
+    color:var(--ink);padding:10px 20px;border-radius:2px;cursor:pointer;
+    transition:all .18s ease;
+  }
+  .controls button:hover{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .controls button.active{background:var(--accent-new);color:#fff;border-color:var(--accent-new);}
+
+  /* ---------- 響應式：窄螢幕改上下堆疊 ---------- */
+  @media (max-width:860px){
+    .grid{grid-template-columns:1fr;}
+    .col-tab{position:static;}
+    .col-tab:first-of-type{border-right:none;}
+    .seg.current{border-right:none;border-bottom:2px solid var(--rule-strong);}
+    .section-note{flex-direction:column;gap:6px;}
+    .section-note .sec-title{border-right:none;border-bottom:1px solid var(--rule-strong);padding-right:0;padding-bottom:6px;}
+    .wrap,.masthead{padding-left:18px;padding-right:18px;}
+    body.stack-hide-current .seg.current,
+    body.stack-hide-current .col-tab:first-of-type{display:none;}
+    body.stack-hide-next .seg.next,
+    body.stack-hide-next .col-tab:nth-of-type(2){display:none;}
+  }
+  /* 列印 */
+  @media print{
+    body{background:#fff;}
+    .controls{display:none;}
+    .grid{box-shadow:none;}
+  }
+</style>
+</head>
+<body>
+
+  <header class="masthead">
+    <div class="kicker">FORMAT PREVIEW · 新舊排版並排</div>
+    <h1>【投資水晶球】市場指令優化改版</h1>
+  </header>
+
+  <div class="wrap">
+
+    <section class="instructions">
+<p>請閱讀下方投資水晶球<strong>美國市場 6/1 當日摘要內容</strong>目前版本及新版，於 <strong>Outlook 信件投票回覆</strong>，可以從閱讀流暢度、重點掌握度、資訊價值等判斷，改版後內容是否有比較好，如有其他回饋也歡迎一併回信回饋~</p>
+    </section>
+
+    <section class="highlights">
+      <h2><span class="num">§</span>本次優化重點</h2>
+      <ol>
+        <li><span class="idx">1</span><div><strong>敘事口語化</strong>：目前版本偏向研究分析報告寫法，新版改以<strong>口語化、故事化</strong>方式陳述市場脈絡、拆解專業術語，讓一般大眾<strong>好讀、好懂、讀得進去</strong>，仍保有深度觀點分析。</div></li>
+        <li><span class="idx">2</span><div><strong>架構重定義</strong>：重整為五段式文章架構——【一句話看市場】、【近期市場脈動】、【水晶球訊號】、【接下來看什麼】、【近期關鍵事件回顧】。每段落功能定義清楚、精簡條列資訊，讓讀者更能掌握核心重點。</div></li>
+        <li><span class="idx">3</span><div><strong>篇幅大瘦身</strong>：相同的論點及數據不重複論述、分析，大幅減少文章篇幅，減輕讀者負擔。</div></li>
+        <li><span class="idx">4</span><div><strong>翻譯慣用化</strong>：全面汰換中國譯名，改採成台灣慣用譯名（如霍爾木茲→荷姆茲、特朗普→川普等）。</div></li>
+        <li><span class="idx">5</span><div><strong>其他細項調整</strong>：修正目前產出會出現的偶發問題，包括「近期關鍵事件回顧」日期缺漏、文章出現「標竿文章、標竿內容」等用字。</div></li>
+      </ol>
+    </section>
+
+    <section class="ai-analysis">
+      <h2><span class="num">✦</span>AI 分析：兩版差異總結</h2>
+      <div class="body">
+<p>兩版的<strong>分析觀點與結論高度一致</strong>——AI 牛市撐起指數、戰爭與油價推升通膨、聯準會從降息劇本轉為再升息劇本——真正的差異在<strong>敘事結構、閱讀負擔與用語親和度</strong>。</p>
+<p><strong>目前版本是分析報告體</strong>：以「主要趨勢演變→三大關鍵驅動因子→未來焦點→事件回顧」層層論證，邏輯嚴謹、資訊密度高，每個論點都有完整推導與多層支撐，適合需要看完整論證的專業讀者，但需要較高的閱讀專注度，重點容易藏在長段落裡。</p>
+<p><strong>新版改為口語敘事體</strong>：先用一句話給出當日結論（AI 榮景 vs 高利率現實的十字路口），再以「五點市場脈動」拆解現況、「水晶球訊號」給出兩條核心判斷、「接下來看什麼」列出四個追蹤點，每點都有粗體小結與生活化比喻（裝沒事、走鋼索、一手抱 AI 一手抱現金），<strong>掃讀效率明顯提升</strong>。同時新版做了三件結構性瘦身：相同論點不重複論述、翻譯統一為台灣慣用語、事件日期完整補齊。</p>
+<p>整體取捨是：新版以<strong>少量論證深度</strong>，換取<strong>更廣的可讀性、更快的重點掌握與更低的閱讀門檻</strong>——對每日快速瀏覽的投資人，新版在「願意讀完」與「讀完記得住」兩件事上明顯佔優。</p>
+      </div>
+    </section>
+
+    <div class="compare-head">
+      <span class="line"></span>
+      <span class="label">逐欄並排 · 左右對照</span>
+      <span class="line"></span>
+    </div>
+
+    <div class="grid">
+      <div class="col-tab" style="grid-column:1;">
+        <span class="tag">Current</span>
+        <h3>目前版本</h3>
+      </div>
+      <div class="col-tab" style="grid-column:2;">
+        <span class="tag">New</span>
+        <h3>新版</h3>
+      </div>
+      <div class="section-note"><span class="sec-title">開頭定調</span><span class="sec-why"><span class="badge">段落說明</span>新版以<strong>一句話點出近期市場最重要的一條主線</strong>。</span></div>
+      <div class="seg current"><div class="article"><h4>【近期市場評論重點如下】:</h4>
+<h4>【主要趨勢演變】</h4>
+<p>近期美國市場的敘事，已從單純的「AI 牛市＋高利率壓力」進一步演化為三條主線交織：</p>
+<p>(1) AI 驅動的獲利與資本支出，撐起指數並同時推升通膨與利率下限；</p>
+<p>(2) 伊朗戰事與能源衝擊，讓通膨從一次性事件轉為結構性風險；</p>
+<p>(3) 在高通膨、高財政赤字與政治施壓下，聯準會與長天期美債的風險溢價被重新定價。</p>
+<p>在這個框架下，美股創高並不代表風險下降，而是「報酬高度集中、風險被推遲與再集中」，形成一種帶有隱性停滯通膨色彩的 AI 牛市。</p></div></div>
+      <div class="seg next"><div class="article"><h4>【Orbit.AI 投資水晶球近期市場評論】</h4>
+<h4>【一句話看市場】</h4>
+<p><strong>美股正卡在「AI 榮景 vs 高利率現實」的十字路口：指數靠人工智慧與企業獲利創高，但通膨再升溫、聯準會語氣轉鷹，讓這波多頭愈走愈像一場對利率與戰爭敏感的高空走鋼索。</strong></p></div></div>
+      <div class="section-note"><span class="sec-title">核心分析</span><span class="sec-why"><span class="badge">段落說明</span>同一個論點，目前版本拆成三大<strong>關鍵驅動因子</strong>長段論證；新版精簡歸納近期市場關鍵事件或數據，精簡描述該事件、背景脈絡及該事件與其他事件關聯。</span></div>
+      <div class="seg current"><div class="article"><h4>1. 關鍵驅動因子1：AI 盈餘動能與資本支出——同時推高 EPS 與折現率</h4>
+<p>近期多份分析一致指出，美股多頭的核心已不再是「通膨回落、利率將降」，而是 AI 帶動的獲利與資本支出：</p>
+<ul>
+<li>費城半導體指數自 3 月底以來大漲約 80%，Broadcom、Micron 等 AI 關鍵企業股價大幅上漲，AI 伺服器與雲端相關族群甚至出現「一檔財報帶動全鏈噴出」的現象。</li>
+<li>S&amp;P 500 EPS 2026 年成長預估維持高雙位數，標竿預估至 309、指數目標 7,800–8,000 點的看法並未被近期通膨與利率再定價所動搖。</li>
+</ul>
+<p>這一波 AI 推動的上修不只是故事，而是有真實獲利與 Capex 撐底。結果是：股價對利率的「耐受度」暫時提升、AI 同時成為通膨來源之一、風險由「分散」轉為「集中」。AI 自身就是一個「自我強化但脆弱的迴圈」——一旦成長假設鬆動，估值對利率會一次性敏感反應。</p>
+<h4>2. 關鍵驅動因子2：伊朗戰事與能源——從短期衝擊變成通膨底線上移</h4>
+<p>伊朗戰事及其對荷莫茲海峽的影響，已從「事件風險」升級為「通膨結構風險」。最新報告已將情境調整為：即便名義停火，運輸、保險與風險溢價也可能長期內嵌在油價。</p>
+<p>這種「壞通膨」具有幾個關鍵特徵：PCE 通膨再回到近三年高點，且主由能源與服務帶動；貨幣政策的「兩難」更加尖銳（成長偏弱但無法降息，即「隱性停滯通膨」）；股債關係與全球資金流被重寫（股債報酬相關性轉正，資金改向短天期美債與美元避險）。</p>
+<h4>3. 關鍵驅動因子3：聯準會與長端利率的「風險溢價再定價」</h4>
+<p>在 AI 與戰事兩股力量之上，貨幣與財政政策的框架也出現顯著轉折。政策反應函數由「偏鴿」轉向「真中性但實質偏鷹」；長端利率的 term premium 上升，與央行獨立性疑慮交織；資產定價邏輯從單一「Fed 週期」轉向「利率＋安全＋制裁」三重框架。</p>
+<p>10 年期美債殖利率在 4.4–4.6% 高檔橫向整理，5% 被視為估值調整的關鍵臨界；股市估值模式被迫接受「長期高利率均值」，尤其對長久期成長股折扣更大。「安全／基礎設施」板塊在高利率環境下反而獲得估值支撐。</p>
+<p>綜合三個因子，趨勢演變可概括為：AI 盈餘與 Capex 把指數推上更高檔位，同時透過通膨與利率將整體折現率中樞抬高；伊朗戰事與能源將通膨底線「鎖住」；長端利率風險溢價重估。美股表面多頭強勁，實則處在「高利率更持久、估值對政策與事件高度敏感」的脆弱平衡。</p></div></div>
+      <div class="seg next"><div class="article"><h4>【近期市場脈動】</h4>
+<p><strong>1. AI 把指數推上去，高利率暫時被「裝沒事」</strong>
+近期標普 500 與那斯達克連番改寫歷史高點，今年漲幅已達雙位數，<strong>多頭主角清一色是人工智慧相關科技股與半導體</strong>。費城半導體指數自三月底以來大漲數十個百分點，美光、博通等 AI 受惠股衝上「兆美元俱樂部」，矽谷的故事一路燒到台北、首爾。三月那一波科技股修正，事後看像是讓市場用較便宜的價位重新押注同一個 AI 故事。</p>
+<p><strong>2. 通膨再升、戰爭推油價，市場從「怕衰退」變成「怕過熱」</strong>
+與此同時，美國物價指標卻在升溫。聯準會偏好的個人消費支出物價指數 (PCE) 年增率逼近四字頭，為近一年來高點，最新整體通膨更寫下約三年新高，而<strong>元兇依舊是伊朗戰爭與荷姆茲海峽受阻帶來的油價壓力</strong>。經濟成長數據則被下修到約 1% 多，形成「成長放緩、物價往上」的輕度停滯性通膨畫面。市場敘事也隨之轉向：從年初的「會不會衰退」，變成現在的「會不會過熱逼出更高利率」。</p>
+<p><strong>3. 債市與聯準會口風比股市更冷：降息劇本被收回，升息重新上桌</strong>
+債市對這組「通膨＋戰爭」組合拳反應最直接。十年期美債殖利率自伊朗戰爭爆發後明顯走高，二年期殖利率上升更快，利率期貨開始反映<strong>今年「再升息一次」機率高於降息</strong>。聯準會官員也在補刀：卡什卡利、史密德、鮑曼等人不斷提醒通膨「太熱、方向不對」，新任主席華許接手後，市場先前幻想的「快速降息」幾乎被完全刪除。</p>
+<p><strong>4. AI 資本支出是成長引擎，也是新的通膨來源</strong>
+與過去不同的是，這一輪通膨不只來自戰爭與油價，<strong>人工智慧投資本身也被聯準會點名是短期通膨推手</strong>。大量建置資料中心、伺服器與記憶體，拉高用電、硬體與薪資成本，短期未必馬上換成消費端降價或生產力飛躍。Fed 官員公開提醒：AI 暫時不是壓低物價的「解藥」，更像一台燒錢的成長引擎。</p>
+<p><strong>5. 資金兩頭押：一手抱 AI、一手抱公債與現金</strong>
+結果是出現一幅看似矛盾的圖像：<strong>科技與 AI 主題基金連續多週吸金，美股指數屢創新高；同時，債券與貨幣市場基金也大舉獲得資金</strong>。投資人一邊追逐 AI 成長故事，一邊用公債、現金為自己買保險。美元受惠於利差與避險需求，重新走強；對新興市場與高槓桿經濟體，形成油價與強勢美元的雙重擠壓。</p></div></div>
+      <div class="section-note"><span class="sec-title">推論與展望</span><span class="sec-why"><span class="badge">段落說明</span>目前版本把推論與未來焦點寫成連續長段；新版拆成<strong>水晶球訊號</strong>（新聞背後的觀點＆洞察）與<strong>接下來看什麼</strong>（值得追蹤的關鍵事件＆數據）兩個清單化區塊。</span></div>
+      <div class="seg current"><div class="article"><h4>【未來焦點】</h4>
+<p>近期市場最需要關注的，不再只是單一數據或單一事件，而是三條時間軸如何交叉：</p>
+<p>(1) 未來幾份美國就業與通膨數據是否確認「通膨重新抬頭」或「高位盤整」；</p>
+<p>(2) 伊朗戰事及荷莫茲海峽實際通行與保險成本，會否讓油價停留在高檔平台；</p>
+<p>(3) 即將到來的 AI 核心權值股財報與資本支出指引，能否證實 AI 投資週期仍在加速而非過熱。</p>
+<p>就市場定價而言：如果「就業偏強＋通膨偏高＋油價不下」三者同時出現，升息預期與長端殖利率有機會再被上修至 4.7–5% 區間，AI 板塊任何成長放緩信號都可能放大為「估值擠壓」。相反，若勞動與通膨數據顯示溫和降溫、油價趨勢性回落、AI 訂單能見度維持高檔，市場將維持「高利率但可控／AI 成長抵消折現率」的敘事。</p>
+<p>在這個架構下，市場關注重點應放在：AI 投資從「純成長故事」何時轉為「宏觀與通膨風險來源」的敘事拐點；10 年期美債在 4.5–5% 區間的定價，是否標誌股債相對吸引力重新洗牌；伊朗戰事、國防支出與支付體系地緣競爭，如何持續將「安全與制裁」嵌入美股風險溢價結構。</p></div></div>
+      <div class="seg next"><div class="article"><h4>【水晶球訊號】</h4>
+<p><strong>1. 「AI 多頭」與「高利率時代」可能不是短暫交集，而是一段長時間共存</strong>
+過去市場常習慣把科技創新和低利率綁在一起聯想，如今則可能進入<strong>「成長不差、利率偏高」的長期組合</strong>。AI 帶來的投資熱潮，短期支撐 GDP 與企業獲利，使經濟難以快速降溫；但這也意味著通膨壓力與利率難以迅速回落。對市場而言，風險不一定是立刻崩盤，而是：估值在高利率環境下被慢慢擠壓，波動度與個股表現差異都會比過去幾年更大。</p>
+<p><strong>2. 指數越創高，對單一風險點的依賴就越大</strong>
+目前美股的上漲高度集中在少數 AI 與半導體巨頭，<strong>指數榮景與「主街」感受可能出現越來越大的落差</strong>。這帶來兩層隱性風險：一是只要幾檔核心 AI 股財報或前景指引出現閃失，整體市場就容易被放大波動；二是當家庭儲蓄率偏低、利率與物價壓力堆在中低收入族群身上時，一旦就業或消費轉弱，衝擊不僅是數據難看，而可能透過政治、財政與信心面，以另一種形式回頭影響市場。</p>
+<h4>【接下來看什麼】</h4>
+<ol>
+<li><strong>美國就業數據與失業率</strong>：若新增就業遠高於市場預期、失業率再往下，市場可能把「經濟韌性」解讀為「過熱」，進一步強化再升息的想像。</li>
+<li><strong>博通等 AI 核心企業財報與展望</strong>：這不只是單一公司成績單，而是市場用來檢驗「AI 資本支出是否真有訂單支撐」的壓力測試，足以牽動整個半導體與科技族群。</li>
+<li><strong>伊朗戰爭與荷姆茲海峽進展</strong>：停火協議是否實質落地、航運是否恢復，將直接影響油價與通膨預期，是左右美債殖利率與聯準會政策想像的最大外生變數。</li>
+<li><strong>聯準會 6 月會議前後的訊息與點陣圖</strong>：華許領導下的首場會議，將重新校準市場對「利率會高多久」的認知。</li>
+</ol></div></div>
+      <div class="section-note"><span class="sec-title">近期關鍵事件回顧</span></div>
+      <div class="seg current"><div class="article"><h4>【近期關鍵事件回顧】</h4>
+<ul>
+<li>[2026-05-27] 10 年期美國公債殖利率自伊朗戰爭爆發以來上升約 50 個基點至約 4.45–4.50%，2 年期上升約 70 個基點。</li>
+<li>[2026-05-27] 美國 4 月 CPI 年增率為 3.8%，高於 2025 年 8 月的 2.9%。</li>
+<li>[2026-05-27] 美聯儲新任主席 Kevin Warsh 接任後首次 FOMC 會議訂於 6 月 16–17 日，市場對 2026 年底前升息 25bp 的機率約為 50%。</li>
+<li>[2026-05-28] 美國 Q1 GDP 年化季增率下修至 1.6%，低於先前公布的 2.0%。</li>
+<li>[2026-05-28] 美國 4 月 PCE 物價指數年增 3.8%，核心 PCE 年增 3.3%。</li>
+<li>[2026-05-29] 亞特蘭大聯準銀行 GDPNow 模型預估，美國第二季 GDP 年化成長率約 3.8%。</li>
+<li>[2026-05-29] 市場預估 5 月非農就業新增約 96,000–100,000 人，失業率 4.3%，部分機構警告若新增就業超過 150,000 人可能引發過熱與升息憂慮。</li>
+<li>[2026-05-30] 美國通膨率升至近三年高點，多位聯準會官員表示 AI 相關投資可能短期推升成本與價格。</li>
+<li>[2026-05-30] UBS HOLT 分析顯示，多數美國支付與金融科技公司股價隱含的長期營收成長率顯著低於分析師共識。</li>
+<li>[2026-05-31] 利率期貨顯示，市場對 2026 年內升息的機率評價高於降息，10 年期美債殖利率自 2 月底約 3.9% 一度升至逾 4.65%，近期約 4.45%。</li>
+</ul></div></div>
+      <div class="seg next"><div class="article"><h4>【近期關鍵事件回顧】</h4>
+<ul>
+<li>【2026-05-31】標普 500 指數連續第九週上漲，今年以來漲幅超過約一成，那斯達克漲幅更高；費城半導體指數自三月底低點以來大漲約八成，部分大型半導體股漲幅逾五成。</li>
+<li>【2026-05-31】十年期美國公債殖利率近月自不到 4% 升至約 4.45%，期間曾一度突破 4.65%；市場對美國長期財政與通膨的疑慮升高。</li>
+<li>【2026-05-30】美國最新通膨率升至約三年高點，聯準會官員表示，人工智慧相關投資在短期內可能推升設備、用電與薪資成本，增加物價壓力。</li>
+<li>【2026-05-30】伊朗戰爭與荷姆茲海峽部分封鎖持續，國際機構警告該海域受阻恐推升油價、削弱全球經濟韌性；油價維持在相對高檔。</li>
+<li>【2026-05-30】美光與南韓 SK 海力士市值首度突破約一兆美元，反映市場看好 AI 伺服器與記憶體需求；同時，多家支付與金融科技公司股價隱含的長期成長率偏低。</li>
+<li>【2026-05-29】美國個人消費支出物價指數 (PCE) 年增率約 3.8%，為 2023 年 5 月以來最大升幅，主要受能源價格推動；核心 PCE 年增率在 3% 以上。</li>
+<li>【2026-05-29】亞特蘭大聯邦準備銀行 GDPNow 模型預估，美國第二季實質 GDP 年化成長率接近 4%；同時，第一季實質 GDP 被下修至約 1.6%。</li>
+<li>【2026-05-29】期貨與利率市場定價顯示，今年內聯準會再度升息的機率已高於降息；十年期美債殖利率約在 4.45–4.5% 區間震盪。</li>
+<li>【2026-05-28】美軍與伊朗再度互相空襲，荷姆茲海峽航運持續受阻，布蘭特原油價格在短線大跌後反彈至每桶約九十多美元；美國 10 年期公債殖利率在 4.48–4.53% 波動。</li>
+<li>【2026-05-27】美元指數自 2 月底以來上升約 1.5%，逼近過去一年盤整區上緣；自伊朗戰爭爆發以來，10 年期美債殖利率約上升 50 個基點，2 年期上升約 70 個基點，反映市場為「再次升息」重新定價。</li>
+</ul></div></div>
+    </div>
+
+    <div class="controls">
+      <button id="btn-both" class="active">並排對照</button>
+      <button id="btn-cur">只看目前版本</button>
+      <button id="btn-new">只看新版</button>
+      <button id="btn-print">列印 / 存 PDF</button>
+    </div>
+
+  </div>
+
+<script>
+  // 窄螢幕下，讓讀者可一鍵切換單看某一版（寬螢幕仍維持並排）
+  const body = document.body;
+  const btnBoth = document.getElementById('btn-both');
+  const btnCur  = document.getElementById('btn-cur');
+  const btnNew  = document.getElementById('btn-new');
+  function setView(mode){
+    body.classList.remove('stack-hide-current','stack-hide-next');
+    [btnBoth,btnCur,btnNew].forEach(b=>b.classList.remove('active'));
+    if(mode==='cur'){ body.classList.add('stack-hide-next'); btnCur.classList.add('active'); }
+    else if(mode==='new'){ body.classList.add('stack-hide-current'); btnNew.classList.add('active'); }
+    else { btnBoth.classList.add('active'); }
+  }
+  btnBoth.onclick=()=>setView('both');
+  btnCur.onclick =()=>setView('cur');
+  btnNew.onclick =()=>setView('new');
+  document.getElementById('btn-print').onclick=()=>window.print();
+</script>
+</body>
+</html>
